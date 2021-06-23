@@ -2,3 +2,4 @@ spawn;background;0,0,0
 spawn;generator;0,0,0
 spawn;filter;0,5,0
 spawn;filter;1.5,3.5,0
+spawn;professor;0,0,0

@@ -9,7 +9,7 @@ public class ObjectBrain : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        centralbrainObject = GameObject.Find("CentralBrainObject");
     }
 
     // Update is called once per frame
@@ -20,7 +20,6 @@ public class ObjectBrain : MonoBehaviour
 
     private void OnMouseDown()
     {
-        centralbrainObject = GameObject.Find("CentralBrainObject");
         centralbrainObject.GetComponent<CentralBrain>().eventList.Add(new Event {Command = "destroy", ChosenObject = "filter", Position = gameObject.transform.position});
     }
 }

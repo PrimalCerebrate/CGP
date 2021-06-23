@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Conversation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <subNodes>
+    <ContentNode idNum="1" orderNum="1" linkTo="0" nodeType="npc">
+      <conversationText>You are late. Do you know why I called you in here? You missed an entire semester of practical courses. I give you a last chance to not repeat this semester. This experimental setup in front of you has one error built in. Fix it.</conversationText>
+      <conversationComments />
+      <subNodes>
+        <ContentNode idNum="2" orderNum="1" linkTo="0" nodeType="pc">
+          <conversationText>I have/ already found the solution.</conversationText>
+          <conversationComments />
+          <subNodes>
+            <ContentNode idNum="9" orderNum="1" linkTo="0" nodeType="npc">
+              <conversationText>Then, what is it?</conversationText>
+              <conversationComments />
+              <subNodes>
+                <ContentNode idNum="10" orderNum="1" linkTo="0" nodeType="pc">
+                  <conversationText>It is/ the tape.</conversationText>
+                  <conversationComments />
+                  <subNodes>
+                    <ContentNode idNum="18" orderNum="1" linkTo="0" nodeType="npc">
+                      <conversationText>That is right! Thank you for helping me destroy the world!</conversationText>
+                      <conversationComments />
+                      <subNodes />
+                      <additionalData />
+                      <infoObjects />
+                    </ContentNode>
+                  </subNodes>
+                  <additionalData>
+                    <Info variableName="preconds" variableValue="destroy flextape" />
+                  </additionalData>
+                  <infoObjects />
+                </ContentNode>
+                <ContentNode idNum="13" orderNum="2" linkTo="0" nodeType="pc">
+                  <conversationText>It is/ not what you think. </conversationText>
+                  <conversationComments />
+                  <subNodes>
+                    <ContentNode idNum="19" orderNum="1" linkTo="0" nodeType="npc">
+                      <conversationText>What do you mean?</conversationText>
+                      <conversationComments />
+                      <subNodes>
+                        <ContentNode idNum="20" orderNum="1" linkTo="0" nodeType="pc">
+                          <conversationText>There is nothing/ in this room that could fix the problem.</conversationText>
+                          <conversationComments />
+                          <subNodes>
+                            <ContentNode idNum="20" orderNum="1" linkTo="0" nodeType="npc">
+                              <conversationText>What have you done? I will come back and finish what I have started.</conversationText>
+                              <conversationComments />
+                              <subNodes />
+                              <additionalData>
+                                <Info variableName="preconds" variableValue="destroy flextape&#xD;&#xA;" />
+                              </additionalData>
+                              <infoObjects />
+                            </ContentNode>
+                            <ContentNode idNum="20" orderNum="2" linkTo="0" nodeType="npc">
+                              <conversationText>I think you are just blind.</conversationText>
+                              <conversationComments />
+                              <subNodes />
+                              <additionalData />
+                              <infoObjects />
+                            </ContentNode>
+                          </subNodes>
+                          <additionalData />
+                          <infoObjects />
+                        </ContentNode>
+                        <ContentNode idNum="21" orderNum="2" linkTo="0" nodeType="pc">
+                          <conversationText>There is nothing/ wrong with this experiment.</conversationText>
+                          <conversationComments />
+                          <subNodes>
+                            <ContentNode idNum="21" orderNum="1" linkTo="0" nodeType="npc">
+                              <conversationText>What do you mean?</conversationText>
+                              <conversationComments />
+                              <subNodes>
+                                <ContentNode idNum="21" orderNum="1" linkTo="0" nodeType="pc">
+                                  <conversationText>The experiment works just fine. Turn on the machine.</conversationText>
+                                  <conversationComments />
+                                  <subNodes />
+                                  <additionalData />
+                                  <infoObjects />
+                                </ContentNode>
+                              </subNodes>
+                              <additionalData />
+                              <infoObjects />
+                            </ContentNode>
+                          </subNodes>
+                          <additionalData />
+                          <infoObjects />
+                        </ContentNode>
+                      </subNodes>
+                      <additionalData />
+                      <infoObjects />
+                    </ContentNode>
+                  </subNodes>
+                  <additionalData />
+                  <infoObjects />
+                </ContentNode>
+              </subNodes>
+              <additionalData />
+              <infoObjects />
+            </ContentNode>
+          </subNodes>
+          <additionalData>
+            <Info variableName="preconds" variableValue="" />
+          </additionalData>
+          <infoObjects />
+        </ContentNode>
+        <ContentNode idNum="3" orderNum="2" linkTo="0" nodeType="pc">
+          <conversationText>You have/ already found the solution.</conversationText>
+          <conversationComments />
+          <subNodes>
+            <ContentNode idNum="11" orderNum="1" linkTo="0" nodeType="npc">
+              <conversationText>What are you talking about? Of course I have, I am testing you. Talk to me again, once you have found it.</conversationText>
+              <conversationComments />
+              <subNodes />
+              <additionalData />
+              <infoObjects />
+            </ContentNode>
+          </subNodes>
+          <additionalData />
+          <infoObjects />
+        </ContentNode>
+        <ContentNode idNum="4" orderNum="3" linkTo="0" nodeType="pc">
+          <conversationText>I have/ no idea what it might be.</conversationText>
+          <conversationComments />
+          <subNodes>
+            <ContentNode idNum="8" orderNum="1" linkTo="0" nodeType="npc">
+              <conversationText>The solution is in this room. Think.</conversationText>
+              <conversationComments />
+              <subNodes />
+              <additionalData />
+              <infoObjects />
+            </ContentNode>
+          </subNodes>
+          <additionalData />
+          <infoObjects />
+        </ContentNode>
+        <ContentNode idNum="5" orderNum="4" linkTo="0" nodeType="pc">
+          <conversationText>You have/ no idea what it might be.</conversationText>
+          <conversationComments />
+          <subNodes>
+            <ContentNode idNum="6" orderNum="1" linkTo="0" nodeType="npc">
+              <conversationText>Excuse me?</conversationText>
+              <conversationComments />
+              <subNodes>
+                <ContentNode idNum="7" orderNum="1" linkTo="0" nodeType="pc">
+                  <conversationText>There is nothing/ in this room that could fix the problem.</conversationText>
+                  <conversationComments />
+                  <subNodes>
+                    <ContentNode idNum="14" orderNum="1" linkTo="0" nodeType="npc">
+                      <conversationText>What have you done? I will come back and finish what I have started.</conversationText>
+                      <conversationComments />
+                      <subNodes />
+                      <additionalData>
+                        <Info variableName="preconds" variableValue="destroy flextape" />
+                      </additionalData>
+                      <infoObjects />
+                    </ContentNode>
+                    <ContentNode idNum="15" orderNum="2" linkTo="0" nodeType="npc">
+                      <conversationText>I think you are just blind.</conversationText>
+                      <conversationComments />
+                      <subNodes />
+                      <additionalData />
+                      <infoObjects />
+                    </ContentNode>
+                  </subNodes>
+                  <additionalData />
+                  <infoObjects />
+                </ContentNode>
+                <ContentNode idNum="12" orderNum="2" linkTo="0" nodeType="pc">
+                  <conversationText>There is nothing/ wrong with this experiment.</conversationText>
+                  <conversationComments />
+                  <subNodes>
+                    <ContentNode idNum="16" orderNum="1" linkTo="0" nodeType="npc">
+                      <conversationText>What do you mean?</conversationText>
+                      <conversationComments />
+                      <subNodes>
+                        <ContentNode idNum="17" orderNum="1" linkTo="0" nodeType="pc">
+                          <conversationText>The experiment works just fine. Turn on the machine.</conversationText>
+                          <conversationComments />
+                          <subNodes />
+                          <additionalData />
+                          <infoObjects />
+                        </ContentNode>
+                      </subNodes>
+                      <additionalData />
+                      <infoObjects />
+                    </ContentNode>
+                  </subNodes>
+                  <additionalData />
+                  <infoObjects />
+                </ContentNode>
+              </subNodes>
+              <additionalData />
+              <infoObjects />
+            </ContentNode>
+          </subNodes>
+          <additionalData />
+          <infoObjects />
+        </ContentNode>
+      </subNodes>
+      <additionalData />
+      <infoObjects />
+    </ContentNode>
+  </subNodes>
+  <additionalData />
+  <infoObjects />
+  <VersionNumber>2</VersionNumber>
+</Conversation>
