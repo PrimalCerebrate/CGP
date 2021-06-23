@@ -4,6 +4,7 @@ ScriptsOnlyBuild:
     - CentralBrain
     - GeneratorBrain
     - ObjectBrain
+    - ProfessorBrain
     - QuitGame
     Unity.2D.Animation.Editor.dll:
     - UnityEditor.U2D.Animation.BoneGizmo
@@ -46,6 +47,7 @@ ScriptsOnlyBuild:
     - UnityEngine.Rendering.Universal.PostProcessData
     - UnityEngine.Rendering.Universal.UniversalAdditionalCameraData
     - UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset
+    - UnityEngine.Rendering.Universal.UniversalRenderPipelineEditorResources
     Unity.Rider.Editor.dll:
     - Packages.Rider.Editor.UnitTesting.CallbackData
     UnityEditor.TestRunner.dll:
@@ -53,6 +55,8 @@ ScriptsOnlyBuild:
     - UnityEditor.TestTools.TestRunner.TestListCacheData
     - UnityEditor.TestTools.TestRunner.TestRun.TestJobDataHolder
     UnityEngine.UI.dll:
+    - UnityEngine.EventSystems.EventSystem
+    - UnityEngine.EventSystems.StandaloneInputModule
     - UnityEngine.UI.Button
     - UnityEngine.UI.CanvasScaler
     - UnityEngine.UI.ContentSizeFitter
@@ -87,10 +91,6 @@ ScriptsOnlyBuild:
     - Class: 104
       Script: {instanceID: 0}
     - Class: 114
-      Script: {instanceID: 11362}
-    - Class: 114
-      Script: {instanceID: 11364}
-    - Class: 114
       Script: {instanceID: 11366}
     - Class: 114
       Script: {instanceID: 11368}
@@ -101,77 +101,87 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 11374}
     - Class: 114
-      Script: {instanceID: 11562}
+      Script: {instanceID: 11376}
     - Class: 114
-      Script: {instanceID: 11714}
+      Script: {instanceID: 11378}
     - Class: 114
-      Script: {instanceID: 11742}
+      Script: {instanceID: 11566}
     - Class: 114
-      Script: {instanceID: 11974}
+      Script: {instanceID: 11638}
     - Class: 114
-      Script: {instanceID: 12040}
+      Script: {instanceID: 11720}
     - Class: 114
-      Script: {instanceID: 12260}
+      Script: {instanceID: 11748}
     - Class: 114
-      Script: {instanceID: 12664}
+      Script: {instanceID: 11980}
     - Class: 114
-      Script: {instanceID: 12726}
+      Script: {instanceID: 12046}
     - Class: 114
-      Script: {instanceID: 12830}
+      Script: {instanceID: 12266}
     - Class: 114
-      Script: {instanceID: 13154}
+      Script: {instanceID: 12672}
     - Class: 114
-      Script: {instanceID: 13440}
+      Script: {instanceID: 12734}
     - Class: 114
-      Script: {instanceID: 13490}
+      Script: {instanceID: 12838}
     - Class: 114
-      Script: {instanceID: 13578}
+      Script: {instanceID: 13004}
     - Class: 114
-      Script: {instanceID: 13732}
+      Script: {instanceID: 13162}
     - Class: 114
-      Script: {instanceID: 14138}
+      Script: {instanceID: 13448}
     - Class: 114
-      Script: {instanceID: 14172}
+      Script: {instanceID: 13498}
     - Class: 114
-      Script: {instanceID: 14570}
+      Script: {instanceID: 13586}
     - Class: 114
-      Script: {instanceID: 14658}
+      Script: {instanceID: 13740}
     - Class: 114
-      Script: {instanceID: 14684}
+      Script: {instanceID: 14048}
     - Class: 114
-      Script: {instanceID: 14852}
+      Script: {instanceID: 14148}
     - Class: 114
-      Script: {instanceID: 14898}
+      Script: {instanceID: 14182}
     - Class: 114
-      Script: {instanceID: 14910}
+      Script: {instanceID: 14580}
     - Class: 114
-      Script: {instanceID: 15336}
+      Script: {instanceID: 14668}
     - Class: 114
-      Script: {instanceID: 15426}
+      Script: {instanceID: 14694}
     - Class: 114
-      Script: {instanceID: 15754}
+      Script: {instanceID: 14862}
     - Class: 114
-      Script: {instanceID: 15996}
+      Script: {instanceID: 14908}
     - Class: 114
-      Script: {instanceID: 16050}
+      Script: {instanceID: 14920}
     - Class: 114
-      Script: {instanceID: 16280}
+      Script: {instanceID: 15054}
     - Class: 114
-      Script: {instanceID: 16308}
+      Script: {instanceID: 15348}
     - Class: 114
-      Script: {instanceID: 16312}
+      Script: {instanceID: 15440}
     - Class: 114
-      Script: {instanceID: 16390}
+      Script: {instanceID: 15768}
     - Class: 114
-      Script: {instanceID: 16534}
+      Script: {instanceID: 16010}
     - Class: 114
-      Script: {instanceID: 16540}
+      Script: {instanceID: 16064}
     - Class: 114
-      Script: {instanceID: 18360}
+      Script: {instanceID: 16102}
     - Class: 114
-      Script: {instanceID: 19128}
+      Script: {instanceID: 16296}
     - Class: 114
-      Script: {instanceID: 19432}
+      Script: {instanceID: 16324}
+    - Class: 114
+      Script: {instanceID: 16328}
+    - Class: 114
+      Script: {instanceID: 16376}
+    - Class: 114
+      Script: {instanceID: 16406}
+    - Class: 114
+      Script: {instanceID: 16550}
+    - Class: 114
+      Script: {instanceID: 16556}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -269,6 +279,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.RenderPipelines.Core.Runtime.dll
     namespaceName: UnityEngine.Rendering.UI
     className: DebugUIHandlerBitField
+  - hash:
+      serializedVersion: 2
+      Hash: 00f275be887d6671c303f8c511d92106
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: GeneratorBrain
   - hash:
       serializedVersion: 2
       Hash: a2113831d3323f931007e1b3812dc814
@@ -745,6 +761,12 @@ ScriptsOnlyBuild:
     className: CinemachinePath
   - hash:
       serializedVersion: 2
+      Hash: 00f275be887d6671c303f8c511d92106
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: ObjectBrain
+  - hash:
+      serializedVersion: 2
       Hash: 4fd8bf02e3089425d3502e26c44ba31a
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
@@ -1003,6 +1025,12 @@ ScriptsOnlyBuild:
     className: RenderObjects
   - hash:
       serializedVersion: 2
+      Hash: 00f275be887d6671c303f8c511d92106
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: ProfessorBrain
+  - hash:
+      serializedVersion: 2
       Hash: 6225eb0973ab0af667bc5f9d1b1b18de
     assemblyName: Cinemachine.dll
     namespaceName: Cinemachine
@@ -1129,6 +1157,12 @@ ScriptsOnlyBuild:
     className: DebugUIHandlerCanvas
   - hash:
       serializedVersion: 2
+      Hash: 00f275be887d6671c303f8c511d92106
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: QuitGame
+  - hash:
+      serializedVersion: 2
       Hash: 8cd1cbba27f3cb1717254f668e9e0d5a
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
@@ -1189,7 +1223,7 @@ ScriptsOnlyBuild:
     className: CinemachineBrain
   - hash:
       serializedVersion: 2
-      Hash: 84a67013487d36992dbae3c480222138
+      Hash: 0a7770c7f5168264b396e3f49d78194a
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: CentralBrain
@@ -1313,25 +1347,7 @@ ScriptsOnlyBuild:
     assemblyName: Unity.Timeline.dll
     namespaceName: UnityEngine.Timeline
     className: PlayableTrack
-  - hash:
-      serializedVersion: 2
-      Hash: 00f275be887d6671c303f8c511d92106
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: ObjectBrain
-  - hash:
-      serializedVersion: 2
-      Hash: 00f275be887d6671c303f8c511d92106
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: GeneratorBrain
-  - hash:
-      serializedVersion: 2
-      Hash: 00f275be887d6671c303f8c511d92106
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: QuitGame
   platform: 5
   scenePathNames:
   - Assets/Scenes/SampleScene.unity
-  playerPath: F:/Unity_projects/CGP/CGP_v0.1/CGP.exe
+  playerPath: F:/Unity_projects/CGP/CGP.exe

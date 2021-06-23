@@ -5,8 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine.UI;
 using static System.Math;
-using static FileSearch;
-using System;
+using sy = System;
 using CE = Conversation.Editor;
 using Conversation.Editor;
 
@@ -17,26 +16,25 @@ public class Event
     public Vector3 Position { get; set; }
 }
 
-#nullable enable
 public static class Revolver
 {
 
-    static CE.Conversation? conversation;
-    static CE.ContentNode? currentNode;
+    static CE.Conversation conversation;
+    static CE.ContentNode currentNode;
     static IEnumerable<CE.ContentNode> nodes = new List<CE.ContentNode>();
 
     static IEnumerable<string> subNodeTexts => nodes
         .Where(PrecondsFulfilled)
         .Select(node => node.conversationText);
 
-    static bool PrecondsFulfilled(CE.ContentNode node)
-    {
-        string? preconds = GetPreconds(node);
-        return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
-    }
+    static bool PrecondsFulfilled(CE.ContentNode node) => true;
+   // {
+   //      string? preconds = GetPreconds(node);
+   //     return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
+   // }
 
-    static string? GetPreconds(CE.ContentNode node)
-    => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+    //static string? GetPreconds(CE.ContentNode node)
+   // => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
 
     //static IEnumerable<string> subNodeTexts => conversation?.subNodes.AsEnumerable().Select(node => node.conversationText) ?? new List<string>();
     //static IEnumerable<string> subNodeTexts2 => nodes.
@@ -49,7 +47,7 @@ public static class Revolver
         if (uiText is null) return;
         uiText.text = "Loading conversation ...";
 
-        string? pathToConversation = Find(filename);
+        string pathToConversation = Application.streamingAssetsPath + "/Conversations/" + filename;
         if (pathToConversation is null) return;
 
         conversation = Conversation.Editor.Conversation.GetConversation(pathToConversation);
@@ -87,7 +85,7 @@ public static class Revolver
 
     static List<CE.ContentNode> Empty => new List<ContentNode>();
 
-    static ContentNode? GetCurrentNode()
+    static ContentNode GetCurrentNode()
     {
         List<CE.ContentNode> theNodes = nodes.ToList();
         int count = theNodes.Count;
@@ -123,10 +121,10 @@ public static class Revolver
 
     public static void Display(IEnumerable<string> messages)
     {
-        if (null != uiText) uiText.text = string.Join(Environment.NewLine, messages);
+        if (null != uiText) uiText.text = string.Join(sy.Environment.NewLine, messages);
     }
 
-    static Text? uiText => Object.FindObjectsOfType<Text>().FirstOrDefault();
+    static Text uiText => Object.FindObjectsOfType<Text>().FirstOrDefault();
 }
 
 public class CentralBrain : MonoBehaviour
@@ -211,16 +209,33 @@ public class CentralBrain : MonoBehaviour
         }
 
         //Start conversation if an event is saved in currentConversation and player isn't in a conversation already (to avoid restarting the conversation)
-        if (currentConversation != null && !inConversation)
+        if (currentConversation.Command != null && !inConversation)
         {
             Revolver.LoadAConversation(currentConversation.ChosenObject + "Conversation.xml");
+            inConversation = true;
         }
 
         //Display conversation if player in conversation
         if (inConversation)
         {
             Revolver.Display();
+            //Control during conversation
+            if (Input.GetKeyUp(KeyCode.UpArrow))
+            {
+                Revolver.Up();
+            }
+
+            if (Input.GetKeyUp(KeyCode.DownArrow))
+            {
+                Revolver.Down();
+            }
+            if (Input.GetKeyUp(KeyCode.RightArrow))
+            {
+                Revolver.Right();
+            }
         }
+
+        
     }
 
 
@@ -240,7 +255,7 @@ public class CentralBrain : MonoBehaviour
             string loadedCommand = words[0];
             string loadedObject = words[1];
             string[] loadedPosition = words[2].Split(',');
-            Vector3 loadedVector = new Vector3(Convert.ToSingle(loadedPosition[0]), Convert.ToSingle(loadedPosition[1]), Convert.ToSingle(loadedPosition[2]));
+            Vector3 loadedVector = new Vector3(sy.Convert.ToSingle(loadedPosition[0]), sy.Convert.ToSingle(loadedPosition[1]), sy.Convert.ToSingle(loadedPosition[2]));
             eventList.Add(new Event {Command=loadedCommand, ChosenObject=loadedObject, Position=loadedVector});
         }
     }
@@ -248,8 +263,8 @@ public class CentralBrain : MonoBehaviour
     //Spawn a sprite based on the informations delivered by an event
     void SpawnSprite(Event oneEvent)
     {
-        var spriteprefabNames = Array.ConvertAll(spritePrefabs, item => (string)item.name);
-        int keyIndex = Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
+        var spriteprefabNames = sy.Array.ConvertAll(spritePrefabs, item => (string)item.name);
+        int keyIndex = sy.Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
         var clone = Instantiate(spritePrefabs[keyIndex], oneEvent.Position, spritePrefabs[keyIndex].transform.rotation);
         clone.name = oneEvent.ChosenObject;
         existingObjects.Add(clone);
