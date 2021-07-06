@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using UnityEngine.UI;
 using static System.Math;
-using sy = System;
+using Sy = System;
 using CE = Conversation.Editor;
 using Conversation.Editor;
+using System.Collections.Immutable;
 
 public class Event
 {
@@ -30,7 +31,7 @@ public static class Revolver
     static bool PrecondsFulfilled(CE.ContentNode node)
     {
         string preconds = GetPreconds(node);
-        return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds) ;
+        return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds);
     }
 
     static string GetPreconds(CE.ContentNode node)
@@ -118,7 +119,7 @@ public static class Revolver
 
     public static void Display()
     {
-        List<string> changedMessages = subNodeTexts.ToList();
+        List<string> changedMessages = Flatten(SplitInsert(subNodeTexts.ToImmutableList())).ToList();
         if (changedMessages.Any())
         {
             int index = Constrain(subIndex, changedMessages.Count);
@@ -129,10 +130,45 @@ public static class Revolver
 
     public static void Display(IEnumerable<string> messages)
     {
-        if (null != uiText) uiText.text = string.Join(sy.Environment.NewLine, messages);
+        if (null != uiText) uiText.text = string.Join(Sy.Environment.NewLine, messages);
     }
 
     static Text uiText => Object.FindObjectsOfType<Text>().FirstOrDefault();
+
+    static ImmutableList<string> Flatten(ImmutableList<ImmutableList<string>> split)
+    => 0 == split.Count() ? ImmutableList<string>.Empty : Flatten(split[0], split.RemoveAt(0));
+
+    static ImmutableList<string> Flatten(ImmutableList<string> acc, ImmutableList<ImmutableList<string>> split)
+     => 0 == split.Count()
+        ? acc
+        : Flatten(acc.Join(split[0], unit, unit, (a, b) => a + b).ToImmutableList(), split.RemoveAt(0));
+
+    static Sy.Func<string, string> id => x => x;
+    static Sy.Func<string, bool> unit => x => true;
+
+    static ImmutableList<ImmutableList<string>> SplitInsert(ImmutableList<string> nodeTexts)
+    => SplitInsertMutable(nodeTexts).Aggregate(ImmutableList<ImmutableList<string>>.Empty, (acc, next) => acc.Add(next.ToImmutableList()));
+
+    static List<List<string>> SplitInsertMutable(ImmutableList<string> nodeTexts)
+    {
+        return nodeTexts.Aggregate(new List<List<string>>(), (s, next) =>
+        {
+            string[] splitText = next.Split('/');
+            while (s.Count() < splitText.Length) s.Add(new List<string>());
+
+            for (int k = 0; k < splitText.Length; k++)
+            {
+                string fragment = splitText[k];
+                List<string> stack = s[k];
+                if (!stack.Contains(fragment))
+                {
+                    stack.Add(fragment);
+                }
+            }
+            return s;
+        });
+    }
+
 }
 
 public class CentralBrain : MonoBehaviour
@@ -161,7 +197,7 @@ public class CentralBrain : MonoBehaviour
         {
             ReadTextFile(levelFile); //Read file containing level architecture from initial level design
         }
-        
+
     }
 
     // Update is called once per frame
@@ -220,7 +256,8 @@ public class CentralBrain : MonoBehaviour
         {
             Revolver.LoadAConversation(currentConversation.ChosenObject + "Conversation.xml");
             inConversation = true;
-        }else if (currentConversation.Command == null && inConversation)
+        }
+        else if (currentConversation.Command == null && inConversation)
         {
             inConversation = false;
         }
@@ -255,7 +292,7 @@ public class CentralBrain : MonoBehaviour
             }
         }
 
-        
+
     }
 
 
@@ -275,16 +312,16 @@ public class CentralBrain : MonoBehaviour
             string loadedCommand = words[0];
             string loadedObject = words[1];
             string[] loadedPosition = words[2].Split(',');
-            Vector3 loadedVector = new Vector3(sy.Convert.ToSingle(loadedPosition[0]), sy.Convert.ToSingle(loadedPosition[1]), sy.Convert.ToSingle(loadedPosition[2]));
-            eventList.Add(new Event {Command=loadedCommand, ChosenObject=loadedObject, Position=loadedVector});
+            Vector3 loadedVector = new Vector3(Sy.Convert.ToSingle(loadedPosition[0]), Sy.Convert.ToSingle(loadedPosition[1]), Sy.Convert.ToSingle(loadedPosition[2]));
+            eventList.Add(new Event { Command = loadedCommand, ChosenObject = loadedObject, Position = loadedVector });
         }
     }
 
     //Spawn a sprite based on the informations delivered by an event
     void SpawnSprite(Event oneEvent)
     {
-        var spriteprefabNames = sy.Array.ConvertAll(spritePrefabs, item => (string)item.name);
-        int keyIndex = sy.Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
+        var spriteprefabNames = Sy.Array.ConvertAll(spritePrefabs, item => (string)item.name);
+        int keyIndex = Sy.Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
         var clone = Instantiate(spritePrefabs[keyIndex], oneEvent.Position, spritePrefabs[keyIndex].transform.rotation);
         clone.name = oneEvent.ChosenObject;
         existingObjects.Add(clone);
