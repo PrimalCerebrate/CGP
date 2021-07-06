@@ -26,7 +26,7 @@
                     </ContentNode>
                   </subNodes>
                   <additionalData>
-                    <Info variableName="preconds" variableValue="destroy flextape" />
+                    <Info variableName="preconds" variableValue="" />
                   </additionalData>
                   <infoObjects />
                 </ContentNode>
@@ -47,7 +47,7 @@
                               <conversationComments />
                               <subNodes />
                               <additionalData>
-                                <Info variableName="preconds" variableValue="destroy flextape&#xD;&#xA;" />
+                                <Info variableName="preconds" variableValue="It is/ the tape." />
                               </additionalData>
                               <infoObjects />
                             </ContentNode>
@@ -115,7 +115,9 @@
               <infoObjects />
             </ContentNode>
           </subNodes>
-          <additionalData />
+          <additionalData>
+            <Info variableName="preconds" variableValue="I have/ already found the solution." />
+          </additionalData>
           <infoObjects />
         </ContentNode>
         <ContentNode idNum="4" orderNum="3" linkTo="0" nodeType="pc">

@@ -27,20 +27,16 @@ public static class Revolver
         .Where(PrecondsFulfilled)
         .Select(node => node.conversationText);
 
-    static bool PrecondsFulfilled(CE.ContentNode node) => true;
-   // {
-   //      string? preconds = GetPreconds(node);
-   //     return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
-   // }
+    static bool PrecondsFulfilled(CE.ContentNode node)
+    {
+        string preconds = GetPreconds(node);
+        return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds) ;
+    }
 
-    //static string? GetPreconds(CE.ContentNode node)
-   // => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
-
-    //static IEnumerable<string> subNodeTexts => conversation?.subNodes.AsEnumerable().Select(node => node.conversationText) ?? new List<string>();
-    //static IEnumerable<string> subNodeTexts2 => nodes.
+    static string GetPreconds(CE.ContentNode node)
+        => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
 
     static int subIndex = 0;
-
 
     public static void LoadAConversation(string filename)
     {
@@ -142,11 +138,10 @@ public static class Revolver
 public class CentralBrain : MonoBehaviour
 {
     //Used Variables
-    public List<Event> eventList = new List<Event>(); //List of events happening during the game
+    public static List<Event> eventList = new List<Event>(); //List of events happening during the game
     public List<GameObject> existingObjects = new List<GameObject>(); // List of all current gameobjects
     public GameObject[] spritePrefabs; //Array of prefabs, which can be instantiated by the central brain to create objects and characters
-    public bool inConversation = false; //State variable determining, if player in conversation
-
+    public static bool inConversation = false; //State variable determining, if player in conversation
     // Start is called before the first frame update
     void Start()
     {
