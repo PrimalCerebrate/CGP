@@ -8,6 +8,7 @@ using static System.Math;
 using sy = System;
 using CE = Conversation.Editor;
 using Conversation.Editor;
+using System.Collections.Immutable;
 
 public class Event
 {
@@ -28,13 +29,13 @@ public static class Revolver
         .Select(node => node.conversationText);
 
     static bool PrecondsFulfilled(CE.ContentNode node) => true;
-   // {
-   //      string? preconds = GetPreconds(node);
-   //     return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
-   // }
+    // {
+    //      string? preconds = GetPreconds(node);
+    //     return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
+    // }
 
     //static string? GetPreconds(CE.ContentNode node)
-   // => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+    // => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
 
     //static IEnumerable<string> subNodeTexts => conversation?.subNodes.AsEnumerable().Select(node => node.conversationText) ?? new List<string>();
     //static IEnumerable<string> subNodeTexts2 => nodes.
@@ -125,6 +126,41 @@ public static class Revolver
     }
 
     static Text uiText => Object.FindObjectsOfType<Text>().FirstOrDefault();
+
+
+    static ImmutableList<string> Flatten(ImmutableList<ImmutableList<string>> split)
+    => 0 == split.Count() ? ImmutableList<string>.Empty : Flatten(split[0], split.RemoveAt(0));
+
+    static ImmutableList<string> Flatten(ImmutableList<string> acc, ImmutableList<ImmutableList<string>> split)
+     => 0 == split.Count()
+        ? acc
+        : Flatten(acc.Join(split[0], unit, unit, (a, b) => a + b).ToImmutableList(), split.RemoveAt(0));
+
+    static sy.Func<string, string> id => x => x;
+    static sy.Func<string, bool> unit => x => true;
+
+    static ImmutableList<ImmutableList<string>> SplitInsert(ImmutableList<string> nodeTexts)
+    => SplitInsertMutable(nodeTexts).Aggregate(ImmutableList<ImmutableList<string>>.Empty, (acc, next) => acc.Add(next.ToImmutableList()));
+
+    static List<List<string>> SplitInsertMutable(ImmutableList<string> nodeTexts)
+    {
+        return nodeTexts.Aggregate(new List<List<string>>(), (s, next) =>
+        {
+            string[] splitText = next.Split('/');
+            while (s.Count() < splitText.Length) s.Add(new List<string>());
+
+            for (int k = 0; k < splitText.Length; k++)
+            {
+                string fragment = splitText[k];
+                List<string> stack = s[k];
+                if (!stack.Contains(fragment))
+                {
+                    stack.Add(fragment);
+                }
+            }
+            return s;
+        });
+    }
 }
 
 public class CentralBrain : MonoBehaviour
@@ -154,7 +190,7 @@ public class CentralBrain : MonoBehaviour
         {
             ReadTextFile(levelFile); //Read file containing level architecture from initial level design
         }
-        
+
     }
 
     // Update is called once per frame
@@ -235,7 +271,7 @@ public class CentralBrain : MonoBehaviour
             }
         }
 
-        
+
     }
 
 
@@ -256,7 +292,7 @@ public class CentralBrain : MonoBehaviour
             string loadedObject = words[1];
             string[] loadedPosition = words[2].Split(',');
             Vector3 loadedVector = new Vector3(sy.Convert.ToSingle(loadedPosition[0]), sy.Convert.ToSingle(loadedPosition[1]), sy.Convert.ToSingle(loadedPosition[2]));
-            eventList.Add(new Event {Command=loadedCommand, ChosenObject=loadedObject, Position=loadedVector});
+            eventList.Add(new Event { Command = loadedCommand, ChosenObject = loadedObject, Position = loadedVector });
         }
     }
 
