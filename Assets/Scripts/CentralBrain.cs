@@ -70,14 +70,26 @@ public static class Revolver
     }
 
 
-    public static void Right()
+    public static string Right()
     {
+        List<string> stringsofSubnodes = subNodeTexts.ToList();
+        int index = Constrain(subIndex, stringsofSubnodes.Count);
+        string chosenString = stringsofSubnodes[subIndex];
+
         List<ContentNode> subNodes = GetCurrentSubNodes();
         if (subNodes.Any())
         {
             nodes = subNodes;
             subIndex = 0;
         }
+        else
+        {
+            uiText.text = null;
+            nodes = null;
+            chosenString = null;
+        }
+
+        return chosenString;
     }
 
     static List<ContentNode> GetCurrentSubNodes()
@@ -213,6 +225,9 @@ public class CentralBrain : MonoBehaviour
         {
             Revolver.LoadAConversation(currentConversation.ChosenObject + "Conversation.xml");
             inConversation = true;
+        }else if (currentConversation.Command == null && inConversation)
+        {
+            inConversation = false;
         }
 
         //Display conversation if player in conversation
@@ -231,7 +246,17 @@ public class CentralBrain : MonoBehaviour
             }
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
-                Revolver.Right();
+                string chosenMessage;
+                chosenMessage = Revolver.Right();
+
+                if (chosenMessage == null)
+                {
+                    eventList.Add(new Event { Command = "stopConversation", ChosenObject = "TheEnd", Position = new Vector3(0, 0, 0) });
+                }
+                else
+                {
+                    eventList.Add(new Event { Command = "chosenAnswer", ChosenObject = chosenMessage, Position = new Vector3(0, 0, 0) });
+                }
             }
         }
 
