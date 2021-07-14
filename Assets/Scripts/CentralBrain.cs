@@ -51,6 +51,7 @@ public static class Revolver
         string pathToConversation = Application.streamingAssetsPath + "/Conversations/" + filename;
         if (pathToConversation is null) return;
         conversation = Conversation.Editor.Conversation.GetConversation(pathToConversation);
+        currentNode = null;
         ResetRollPrinters();
         PrintRolls();
     }
@@ -100,7 +101,7 @@ public static class Revolver
          text.fontStyle = activeRoll ? FontStyle.Bold : FontStyle.Normal;
          text.color = activeLine ? Color.yellow : Color.gray;
          text.text = line;
-         text.alignment = TextAnchor.UpperLeft;
+         text.alignment = TextAnchor.MiddleCenter;
 
          Rect? subRect = canvasGo?.GetComponent<RectTransform>()?.rect
             .LowerThird()
@@ -286,7 +287,7 @@ public class CentralBrain : MonoBehaviour
     {
         //Build a list containing the world state determined by the events in eventList
         List<Event> worldstateList = new List<Event>();
-        //State variable determining, if player is in a conversation
+        //Variable determining in which conversation the player is right now
         Event currentConversation = new Event();
 
         foreach (var currentEvent in eventList)
