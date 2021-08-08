@@ -1,2 +1,2 @@
 -r:'Conversation Editor.dll'
--r:'System.Collections.Immutable.dll'
+-r:'System.Collections.Immutable'

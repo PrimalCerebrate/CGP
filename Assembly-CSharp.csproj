@@ -66,12 +66,22 @@
     <Compile Include="Assets\Scripts\QuitGame.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Buffers.dll" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Buffers.xml" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Runtime.CompilerServices.Unsafe.xml" />
     <None Include="Assets\Scripts\AdditionalAssemblies\YamlDotNet.dll" />
     <None Include="Assets\Scripts\AdditionalAssemblies\YamlDotNet.xml" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Memory.xml" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Collections.Immutable.dll" />
     <None Include="Assets\StreamingAssets\Conversations\professorConversation.xml" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Memory.dll" />
     <None Include="Assets\Scripts\csc.rsp" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Runtime.CompilerServices.Unsafe.dll" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Collections.Immutable.xml" />
     <None Include="Assets\Scripts\AdditionalAssemblies\Conversation.Editor.dll" />
     <None Include="Assets\StreamingAssets\Levels\leveloutline.txt" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Numerics.Vectors.xml" />
+    <None Include="Assets\Scripts\AdditionalAssemblies\System.Numerics.Vectors.dll" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -296,14 +306,29 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.12f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>Assets\Scripts\AdditionalAssemblies\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="YamlDotNet">
       <HintPath>Assets\Scripts\AdditionalAssemblies\YamlDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics.Vectors">
+      <HintPath>Assets\Scripts\AdditionalAssemblies\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="Conversation.Editor">
       <HintPath>Assets\Scripts\AdditionalAssemblies\Conversation.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="System.Memory">
+      <HintPath>Assets\Scripts\AdditionalAssemblies\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@2.0.0\Runtime\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>Assets\Scripts\AdditionalAssemblies\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Buffers">
+      <HintPath>Assets\Scripts\AdditionalAssemblies\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.12f1\Editor\Data\NetStandard\ref\2.0.0\netstandard.dll</HintPath>

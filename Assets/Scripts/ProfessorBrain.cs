@@ -20,6 +20,9 @@ public class ProfessorBrain : MonoBehaviour
 
     private void OnMouseDown()
     {
-        centralbrainObject.GetComponent<CentralBrain>().eventList.Add(new Event { Command = "startConversation", ChosenObject = "professor", Position = gameObject.transform.position });
+        if (!CentralBrain.inConversation)
+        {
+            CentralBrain.eventList.Add(new Event { Command = "startConversation", ChosenObject = "professor", Position = gameObject.transform.position });
+        }   
     }
 }

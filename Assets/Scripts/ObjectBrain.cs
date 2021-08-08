@@ -20,6 +20,6 @@ public class ObjectBrain : MonoBehaviour
 
     private void OnMouseDown()
     {
-        centralbrainObject.GetComponent<CentralBrain>().eventList.Add(new Event {Command = "destroy", ChosenObject = "filter", Position = gameObject.transform.position});
+        CentralBrain.eventList.Add(new Event {Command = "destroy", ChosenObject = "filter", Position = gameObject.transform.position});
     }
 }

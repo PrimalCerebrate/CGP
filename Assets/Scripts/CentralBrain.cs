@@ -1,132 +1,222 @@
-﻿using System.Collections;
+﻿#nullable enable
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
 using UnityEngine.UI;
 using static System.Math;
-using sy = System;
+using Sy = System;
 using CE = Conversation.Editor;
 using Conversation.Editor;
 using System.Collections.Immutable;
 
 public class Event
 {
-    public string Command { get; set; }
-    public string ChosenObject { get; set; }
+    public string? Command { get; set; }
+    public string? ChosenObject { get; set; }
     public Vector3 Position { get; set; }
 }
 
 public static class Revolver
 {
+    const string revolverTextTag = "RevolverText";
+    static CE.Conversation? conversation;
+    static CE.ContentNode? currentNode;
+    static ImmutableList<ImmutableList<LinePrinter>> printers = ImmutableList<ImmutableList<LinePrinter>>.Empty;
+    static ImmutableList<int> selectedLines = ImmutableList<int>.Empty;
 
-    static CE.Conversation conversation;
-    static CE.ContentNode currentNode;
-    static IEnumerable<CE.ContentNode> nodes = new List<CE.ContentNode>();
+    static int SelectedRoll = 0;
+    static int SelectedLine(int rollIx) => selectedLines.ElementAtOrDefault(rollIx);
 
-    static IEnumerable<string> subNodeTexts => nodes
+    static IEnumerable<string> fulfilledSubTexts
+        => SubNodes
         .Where(PrecondsFulfilled)
         .Select(node => node.conversationText);
 
-    static bool PrecondsFulfilled(CE.ContentNode node) => true;
-    // {
-    //      string? preconds = GetPreconds(node);
-    //     return string.IsNullOrWhiteSpace(preconds) || Brain.Get().HasEventId(preconds);
-    // }
+    static IEnumerable<ContentNode> SubNodes
+    => currentNode?.subNodes ?? conversation?.subNodes ?? new List<ContentNode>();
 
-    //static string? GetPreconds(CE.ContentNode node)
-    // => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
-
-    //static IEnumerable<string> subNodeTexts => conversation?.subNodes.AsEnumerable().Select(node => node.conversationText) ?? new List<string>();
-    //static IEnumerable<string> subNodeTexts2 => nodes.
-
-    static int subIndex = 0;
-
-
-    public static void LoadAConversation(string filename)
+    static bool PrecondsFulfilled(CE.ContentNode node)
     {
-        if (uiText is null) return;
-        uiText.text = "Loading conversation ...";
+        string preconds = GetPreconds(node);
+        return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds);
+    }
 
+    static string GetPreconds(CE.ContentNode node)
+    => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+
+    internal static void LoadAConversation(string filename)
+    {
         string pathToConversation = Application.streamingAssetsPath + "/Conversations/" + filename;
         if (pathToConversation is null) return;
-
         conversation = Conversation.Editor.Conversation.GetConversation(pathToConversation);
-        nodes = conversation.subNodes;
+        currentNode = null;
+        ResetRollPrinters();
+        PrintRolls();
+    }
+
+    delegate void LinePrinter(bool activeRoll, bool activeLine);
+
+    internal static void PrintRolls()
+    {
+        DestroyOldText();
+        for (int rollIx = 0; rollIx < printers.Count; rollIx++)
+        {
+            ImmutableList<LinePrinter> roll = printers[rollIx];
+            for (int lineIx = 0; lineIx < roll.Count; lineIx++)
+            {
+                LinePrinter linePrinter = roll[lineIx];
+                bool isSelectedRoll = SelectedRoll == rollIx;
+                bool isSelectedLine = SelectedLine(rollIx) == lineIx; ;
+                linePrinter(isSelectedRoll, isSelectedLine);
+            }
+        }
+    }
+
+
+    static void ResetRollPrinters()
+    {
+        ImmutableList<ImmutableList<string>> rolls = GetRolls();
+        printers = GetLinePrinters(rolls);
+        selectedLines = printers.Select(x => 0).ToImmutableList();
+    }
+
+    static ImmutableList<ImmutableList<LinePrinter>> GetLinePrinters(ImmutableList<ImmutableList<string>> rolls)
+    => rolls.Select((lines, rollIx) => GetLinePrinters(rolls.Count, rollIx, lines)).ToImmutableList();
+
+    static ImmutableList<LinePrinter> GetLinePrinters(int rollCount, int rollIx, ImmutableList<string> lines)
+     => lines.Select<string, LinePrinter>((line, lineIx)
+     => (bool activeRoll, bool activeLine)
+     =>
+     {
+         GameObject textGo = new GameObject();
+         textGo.transform.parent = canvasGo?.transform;
+         textGo.name = revolverTextTag;
+         textGo.tag = revolverTextTag;
+
+         Text text = textGo.AddComponent<Text>();
+         text.font = arial;
+         text.fontSize = 50;
+         text.fontStyle = activeRoll ? FontStyle.Bold : FontStyle.Normal;
+         text.color = activeLine ? Color.yellow : Color.gray;
+         text.text = line;
+         text.alignment = TextAnchor.MiddleCenter;
+
+         Rect? subRect = canvasGo?.GetComponent<RectTransform>()?.rect
+            .LowerThird()
+            .SubRect(rollCount, lines.Count, rollIx, lineIx);
+
+         if (subRect.HasValue)
+         {
+             RectTransform textRect = textGo.GetComponent<RectTransform>();
+             textRect.localPosition = subRect.Value.position;
+             textRect.sizeDelta = subRect.Value.size;
+         }
+     }).ToImmutableList();
+
+    static Rect LowerHalf(this Rect rect) => LowerSubRect(rect, 2);
+    static Rect LowerThird(this Rect rect) => LowerSubRect(rect, 3);
+
+    static Rect LowerSubRect(this Rect rect, float fraction)
+    => new Rect(rect.x, rect.y, rect.width, rect.height / fraction);
+
+    static Rect SubRect(this Rect rect, int rollCount, int lineCount, int rollIx, int lineIx)
+    {
+        float superWidth = rect.width;
+        float superHeight = rect.height;
+        float width = superWidth / rollCount;
+        float height = superHeight / lineCount;
+        float x = rect.x + width / 2f + width * rollIx;
+        float y = rect.y + height / 2f + lineIx * height;
+        return new Rect(x, y, width, height);
     }
 
     public static void Up()
     {
-        subIndex--;
+        selectedLines = selectedLines.Select((ix, k) => SelectedRoll != k ? ix : Constrain(++ix, GetRollCount(k))).ToImmutableList();
+        PrintRolls();
     }
 
     public static void Down()
     {
-        subIndex++;
+        selectedLines = selectedLines.Select((ix, k) => SelectedRoll != k ? ix : Constrain(--ix, GetRollCount(k))).ToImmutableList();
+        PrintRolls();
     }
+
+    static int GetRollCount(int k) => GetRolls().Select(r => r.Count).ElementAtOrDefault(k);
 
     public static void Left()
     {
-
+        SelectedRoll = Constrain(--SelectedRoll, selectedLines.Count);
+        PrintRolls();
     }
-
 
     public static void Right()
     {
-        List<ContentNode> subNodes = GetCurrentSubNodes();
-        if (subNodes.Any())
+        SelectedRoll = Constrain(++SelectedRoll, selectedLines.Count);
+        PrintRolls();
+    }
+
+    public static void Space()
+    {
+        Sy.Func<ContentNode, bool> FitsPhrase = node => node.conversationText.Replace("/", "").Equals(Phrase);
+
+        ContentNode? node = SubNodes.Where(FitsPhrase).FirstOrDefault();
+        if (null != node)
         {
-            nodes = subNodes;
-            subIndex = 0;
+            currentNode = node;
+            ResetRollPrinters();
+            PrintRolls();
         }
     }
 
-    static List<ContentNode> GetCurrentSubNodes()
-    => GetCurrentNode()?.subNodes ?? Empty;
+    /// <summary>
+    /// The selected phrase of the revolver without slashes.
+    /// </summary>
+    /// <returns>The selected phrase. Empty in case of error.</returns>
+    public static string Phrase => GetPhrase();
 
-    static List<CE.ContentNode> Empty => new List<ContentNode>();
-
-    static ContentNode GetCurrentNode()
+    static string GetPhrase()
     {
-        List<CE.ContentNode> theNodes = nodes.ToList();
-        int count = theNodes.Count;
-        int index = Constrain(subIndex, count);
-        return theNodes.ElementAtOrDefault(index);
+        ImmutableList<string> selection = GetRolls().Zip(selectedLines, (roll, ix) => roll[ix]).ToImmutableList();
+        string phrase = string.Join("", selection);
+        return phrase;
     }
 
-    // public static void Left()
-    // {
-    //     List<CE.ContentNode> theNodes = nodes.ToList();
-    //     if (!theNodes.Any())
-    //     {
-    //         return;
-    //     }
-    //     int count = theNodes.Count;
-    //     int index = Constrain(subIndex, count);
-    //     //theNodes[index].
-    // }
+
+    /// <summary>
+    /// Whether the conversation has reached a leaf of the conversation tree.
+    /// If so, it cannot continue
+    /// </summary>
+    /// <returns>False if the conversation could continue.</returns>
+    public static bool CannotContinue => !SubNodes.Any();
 
     static int Constrain(int index, int count)
-    => index < 0 ? Constrain(index + count, count) : index % count;
+    => count <= 0 ? Constrain(index, 1)
+        : index < 0 ? Constrain(index + count, count) : index % count;
 
-    public static void Display()
+    static ImmutableList<ImmutableList<string>> GetRolls()
+    => SplitInsert(fulfilledSubTexts.ToImmutableList());
+
+
+    static void DestroyOldText()
     {
-        List<string> changedMessages = subNodeTexts.ToList();
-        if (changedMessages.Any())
+        foreach (GameObject go in oldRevolverTexts)
         {
-            int index = Constrain(subIndex, changedMessages.Count);
-            changedMessages[index] = "->" + changedMessages[index];
-            Display(changedMessages);
+            GameObject.Destroy(go);
         }
     }
 
-    public static void Display(IEnumerable<string> messages)
-    {
-        if (null != uiText) uiText.text = string.Join(sy.Environment.NewLine, messages);
-    }
+    static ImmutableList<GameObject> oldRevolverTexts
+    => GameObject.FindGameObjectsWithTag(revolverTextTag).ToImmutableList();
+
+
+    static Font arial => (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+
+    static GameObject? canvasGo => GameObject.FindGameObjectsWithTag("Canvas").FirstOrDefault();
 
     static Text uiText => Object.FindObjectsOfType<Text>().FirstOrDefault();
-
 
     static ImmutableList<string> Flatten(ImmutableList<ImmutableList<string>> split)
     => 0 == split.Count() ? ImmutableList<string>.Empty : Flatten(split[0], split.RemoveAt(0));
@@ -136,8 +226,8 @@ public static class Revolver
         ? acc
         : Flatten(acc.Join(split[0], unit, unit, (a, b) => a + b).ToImmutableList(), split.RemoveAt(0));
 
-    static sy.Func<string, string> id => x => x;
-    static sy.Func<string, bool> unit => x => true;
+    static Sy.Func<string, string> id => x => x;
+    static Sy.Func<string, bool> unit => x => true;
 
     static ImmutableList<ImmutableList<string>> SplitInsert(ImmutableList<string> nodeTexts)
     => SplitInsertMutable(nodeTexts).Aggregate(ImmutableList<ImmutableList<string>>.Empty, (acc, next) => acc.Add(next.ToImmutableList()));
@@ -166,11 +256,10 @@ public static class Revolver
 public class CentralBrain : MonoBehaviour
 {
     //Used Variables
-    public List<Event> eventList = new List<Event>(); //List of events happening during the game
+    public static List<Event> eventList = new List<Event>(); //List of events happening during the game
     public List<GameObject> existingObjects = new List<GameObject>(); // List of all current gameobjects
-    public GameObject[] spritePrefabs; //Array of prefabs, which can be instantiated by the central brain to create objects and characters
-    public bool inConversation = false; //State variable determining, if player in conversation
-
+    public GameObject[] spritePrefabs = new GameObject[0]; //Array of prefabs, which can be instantiated by the central brain to create objects and characters
+    public static bool inConversation = false; //State variable determining, if player in conversation
     // Start is called before the first frame update
     void Start()
     {
@@ -198,7 +287,7 @@ public class CentralBrain : MonoBehaviour
     {
         //Build a list containing the world state determined by the events in eventList
         List<Event> worldstateList = new List<Event>();
-        //State variable determining, if player is in a conversation
+        //Variable determining in which conversation the player is right now
         Event currentConversation = new Event();
 
         foreach (var currentEvent in eventList)
@@ -250,24 +339,45 @@ public class CentralBrain : MonoBehaviour
             Revolver.LoadAConversation(currentConversation.ChosenObject + "Conversation.xml");
             inConversation = true;
         }
+        else if (currentConversation.Command == null && inConversation)
+        {
+            inConversation = false;
+        }
 
         //Display conversation if player in conversation
         if (inConversation)
         {
-            Revolver.Display();
+
             //Control during conversation
             if (Input.GetKeyUp(KeyCode.UpArrow))
             {
                 Revolver.Up();
             }
-
             if (Input.GetKeyUp(KeyCode.DownArrow))
             {
                 Revolver.Down();
             }
+            if (Input.GetKeyUp(KeyCode.LeftArrow))
+            {
+                Revolver.Left();
+            }
             if (Input.GetKeyUp(KeyCode.RightArrow))
             {
                 Revolver.Right();
+            }
+            if (Input.GetKeyUp(KeyCode.Space))
+            {
+                Revolver.Space();
+
+                if (Revolver.CannotContinue)
+                {
+                    eventList.Add(new Event { Command = "stopConversation", ChosenObject = "TheEnd", Position = new Vector3(0, 0, 0) });
+                }
+                else
+                {
+                    string chosenMessage = Revolver.Phrase;
+                    eventList.Add(new Event { Command = "chosenAnswer", ChosenObject = chosenMessage, Position = new Vector3(0, 0, 0) });
+                }
             }
         }
 
@@ -291,7 +401,7 @@ public class CentralBrain : MonoBehaviour
             string loadedCommand = words[0];
             string loadedObject = words[1];
             string[] loadedPosition = words[2].Split(',');
-            Vector3 loadedVector = new Vector3(sy.Convert.ToSingle(loadedPosition[0]), sy.Convert.ToSingle(loadedPosition[1]), sy.Convert.ToSingle(loadedPosition[2]));
+            Vector3 loadedVector = new Vector3(Sy.Convert.ToSingle(loadedPosition[0]), Sy.Convert.ToSingle(loadedPosition[1]), Sy.Convert.ToSingle(loadedPosition[2]));
             eventList.Add(new Event { Command = loadedCommand, ChosenObject = loadedObject, Position = loadedVector });
         }
     }
@@ -299,8 +409,8 @@ public class CentralBrain : MonoBehaviour
     //Spawn a sprite based on the informations delivered by an event
     void SpawnSprite(Event oneEvent)
     {
-        var spriteprefabNames = sy.Array.ConvertAll(spritePrefabs, item => (string)item.name);
-        int keyIndex = sy.Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
+        var spriteprefabNames = Sy.Array.ConvertAll(spritePrefabs, item => (string)item.name);
+        int keyIndex = Sy.Array.IndexOf(spriteprefabNames, oneEvent.ChosenObject);
         var clone = Instantiate(spritePrefabs[keyIndex], oneEvent.Position, spritePrefabs[keyIndex].transform.rotation);
         clone.name = oneEvent.ChosenObject;
         existingObjects.Add(clone);
@@ -308,5 +418,4 @@ public class CentralBrain : MonoBehaviour
 
 }
 
-//holding space for code
-//
+#nullable disable

@@ -30,7 +30,7 @@ public class QuitGame : MonoBehaviour
         StreamWriter writer = new StreamWriter(fileCreate);
 
         //Write events to gamesave.txt
-        foreach (var currentEvent in centralbrainObject.GetComponent<CentralBrain>().eventList)
+        foreach (var currentEvent in CentralBrain.eventList)
         {
             string saveLine = currentEvent.Command + ";" + currentEvent.ChosenObject + ";" + currentEvent.Position.x + "," + currentEvent.Position.y + "," + currentEvent.Position.z;
             writer.WriteLine(saveLine);

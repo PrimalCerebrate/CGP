@@ -25,6 +25,6 @@ public class GeneratorBrain : MonoBehaviour
     {
         centralbrainObject = GameObject.Find("CentralBrainObject");
         Vector3 spawnPos = new Vector3(Random.Range(-spawnRangeX, spawnRangeX), Random.Range(-spawnRangeY, spawnRangeY), spawnPosZ);
-        centralbrainObject.GetComponent<CentralBrain>().eventList.Add(new Event { Command = "spawn", ChosenObject = "filter", Position = spawnPos});
+        CentralBrain.eventList.Add(new Event { Command = "spawn", ChosenObject = "filter", Position = spawnPos});
     }
 }
