@@ -39,12 +39,15 @@ public static class Revolver
 
     static bool PrecondsFulfilled(CE.ContentNode node)
     {
-        string preconds = GetPreconds(node);
+        string preconds = node.GetPreconds();
         return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds);
     }
 
-    static string GetPreconds(CE.ContentNode node)
+    static string GetPreconds(this CE.ContentNode node)
     => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+
+    static bool IsTimedNode(this CE.ContentNode node)
+    => node.GetPreconds().Contains("timer");
 
     internal static void LoadAConversation(string filename)
     {
