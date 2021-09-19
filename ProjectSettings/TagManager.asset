@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Canvas
   - RevolverText
+  - RevolverTimerText
   layers:
   - Default
   - TransparentFX
