@@ -132,7 +132,9 @@
               <infoObjects />
             </ContentNode>
           </subNodes>
-          <additionalData />
+          <additionalData>
+            <Info variableName="preconds" variableValue="timer" />
+          </additionalData>
           <infoObjects />
         </ContentNode>
         <ContentNode idNum="5" orderNum="4" linkTo="0" nodeType="pc">

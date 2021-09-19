@@ -10,6 +10,9 @@ using Sy = System;
 using CE = Conversation.Editor;
 using Conversation.Editor;
 using System.Collections.Immutable;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 public class Event
 {
@@ -21,6 +24,8 @@ public class Event
 public static class Revolver
 {
     const string revolverTextTag = "RevolverText";
+    const string revolverTimerTextTag = "RevolverTimerText";
+
     static CE.Conversation? conversation;
     static CE.ContentNode? currentNode;
     static ImmutableList<ImmutableList<LinePrinter>> printers = ImmutableList<ImmutableList<LinePrinter>>.Empty;
@@ -28,6 +33,22 @@ public static class Revolver
 
     static int SelectedRoll = 0;
     static int SelectedLine(int rollIx) => selectedLines.ElementAtOrDefault(rollIx);
+
+    static CancellationTokenSource? cancellationTokenSource;
+
+    const int numberOfTimeoutSteps = 10;
+    const int timeoutStep_ms = 1_000;
+
+    // Unity does not want GameObjects to be modified in the thread pool.
+    static ConcurrentQueue<Sy.Action> updates = new ConcurrentQueue<Sy.Action>();
+
+    internal static void Update()
+    {
+        if (updates.TryDequeue(out Sy.Action result))
+        {
+            result.Invoke();
+        }
+    }
 
     static IEnumerable<string> fulfilledSubTexts
         => SubNodes
@@ -39,15 +60,27 @@ public static class Revolver
 
     static bool PrecondsFulfilled(CE.ContentNode node)
     {
-        string preconds = node.GetPreconds();
+        string? preconds = node.GetPreconds();
         return string.IsNullOrWhiteSpace(preconds) || CentralBrain.eventList.Select(x => x.ChosenObject).Contains(preconds);
     }
 
-    static string GetPreconds(this CE.ContentNode node)
-    => node.additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+    static string? GetPreconds(this CE.ContentNode node)
+    => node.additionalData.GetPreconds();
 
-    static bool IsTimedNode(this CE.ContentNode node)
-    => node.GetPreconds().Contains("timer");
+    static string? GetPreconds(this CE.Conversation root)
+    => root.additionalData.GetPreconds();
+
+    static string? GetPreconds(this List<Info> additionalData)
+    => additionalData.Where(x => "preconds" == x.variableName).Select(x => x.variableValue).FirstOrDefault();
+
+    static bool HasTimerPrecond(this CE.ContentNode node)
+    => node.GetPreconds()?.Contains("timer") ?? false;
+
+    static bool IsTimerNode()
+    => SubNodes.Aggregate(false, (s, n) => s || n.HasTimerPrecond());
+
+    static CE.ContentNode? GetTimerSubNode()
+    => SubNodes.Where(n => n.HasTimerPrecond()).FirstOrDefault();
 
     internal static void LoadAConversation(string filename)
     {
@@ -55,6 +88,82 @@ public static class Revolver
         if (pathToConversation is null) return;
         conversation = Conversation.Editor.Conversation.GetConversation(pathToConversation);
         SetCurrentNodeAndPrint(null);
+    }
+
+    delegate void SetTimeoutText(string text);
+
+    static void SetCurrentNodeAndPrint(ContentNode? node)
+    {
+        currentNode = node;
+        ResetRollPrinters();
+        PrintRolls();
+
+        cancellationTokenSource?.Cancel();
+        if (IsTimerNode())
+        {
+            cancellationTokenSource = new CancellationTokenSource();
+            SetTimeoutText setText = AddTimeoutTextField();
+            Task.Run(() => TimeoutTask(setText, cancellationTokenSource.Token), cancellationTokenSource.Token);
+        }
+    }
+
+    static async Task TimeoutTask(SetTimeoutText setTimeoutText, CancellationToken token)
+    {
+        int k = numberOfTimeoutSteps;
+        while (0 < k && !token.IsCancellationRequested)
+        {
+            updates.Enqueue(() => setTimeoutText(k.ToString()));
+            try
+            {
+                await Task.Delay(timeoutStep_ms, token);
+            }
+            catch (TaskCanceledException)
+            {
+                break;
+            }
+            k--;
+        }
+        if (!token.IsCancellationRequested)
+        {
+            // Timeout reached because the player has not clicked space.
+            updates.Enqueue(() => SetCurrentNodeAndPrint(GetTimerSubNode()));
+        }
+        updates.Enqueue(DestroyOldTimeoutTextField);
+    }
+
+    static void DestroyOldTimeoutTextField()
+    {
+        foreach (GameObject go in GameObject.FindGameObjectsWithTag(revolverTimerTextTag))
+        {
+            GameObject.Destroy(go);
+        }
+    }
+
+    static SetTimeoutText AddTimeoutTextField()
+    {
+        GameObject textGo = new GameObject();
+        textGo.transform.parent = canvasGo?.transform;
+        textGo.name = revolverTimerTextTag;
+        textGo.tag = revolverTimerTextTag;
+
+        Text text = textGo.AddComponent<Text>();
+        text.font = arial;
+        text.fontSize = 50;
+        text.fontStyle = FontStyle.Italic;
+        text.color = Color.gray;
+        text.alignment = TextAnchor.UpperCenter;
+
+        Rect? subRect = canvasGo?.GetComponent<RectTransform>()?.rect
+           .LowerThird()
+           .SubRect(1, 3, 0, 1);
+
+        if (subRect.HasValue)
+        {
+            RectTransform textRect = textGo.GetComponent<RectTransform>();
+            textRect.localPosition = subRect.Value.position;
+            textRect.sizeDelta = subRect.Value.size;
+        }
+        return x => text.text = x;
     }
 
     delegate void LinePrinter(bool activeRoll, bool activeLine);
@@ -91,13 +200,13 @@ public static class Revolver
      => (bool activeRoll, bool activeLine)
      =>
      {
-        int offset = lineIx - SelectedLine(rollIx);
-        int linecountThree = Min(lines.Count, 3);
+         int offset = lineIx - SelectedLine(rollIx);
+         int linecountThree = Min(lines.Count, 3);
 
          if (1 < Abs(offset))
-        {
+         {
              return;
-        }
+         }
          GameObject textGo = new GameObject();
          textGo.transform.parent = canvasGo?.transform;
          textGo.name = revolverTextTag;
@@ -114,7 +223,7 @@ public static class Revolver
 
          Rect? subRect = canvasGo?.GetComponent<RectTransform>()?.rect
             .LowerThird()
-            .SubRect(rollCount, linecountThree, rollIx, (offset+3)%linecountThree);
+            .SubRect(rollCount, linecountThree, rollIx, (offset + 3) % linecountThree);
 
          if (subRect.HasValue)
          {
@@ -126,9 +235,13 @@ public static class Revolver
 
     static Rect LowerHalf(this Rect rect) => LowerSubRect(rect, 2);
     static Rect LowerThird(this Rect rect) => LowerSubRect(rect, 3);
+    static Rect UpperThird(this Rect rect) => UpperSubRect(rect, 3);
 
     static Rect LowerSubRect(this Rect rect, float fraction)
     => new Rect(rect.x, rect.y, rect.width, rect.height / fraction);
+
+    static Rect UpperSubRect(this Rect rect, float fraction)
+    => new Rect(rect.x, rect.y + rect.height / fraction, rect.width, rect.height / fraction);
 
     static Rect SubRect(this Rect rect, int rollCount, int lineCount, int rollIx, int lineIx)
     {
@@ -178,12 +291,6 @@ public static class Revolver
         }
     }
 
-    static void SetCurrentNodeAndPrint(ContentNode? node)
-    {
-        currentNode = node;
-        ResetRollPrinters();
-        PrintRolls();
-    }
 
     /// <summary>
     /// The selected phrase of the revolver without slashes.
@@ -265,6 +372,7 @@ public static class Revolver
             return s;
         });
     }
+
 }
 
 public class CentralBrain : MonoBehaviour
@@ -393,6 +501,8 @@ public class CentralBrain : MonoBehaviour
                     eventList.Add(new Event { Command = "chosenAnswer", ChosenObject = chosenMessage, Position = new Vector3(0, 0, 0) });
                 }
             }
+
+            Revolver.Update();
         }
 
 
