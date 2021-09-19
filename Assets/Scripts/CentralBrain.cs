@@ -90,6 +90,13 @@ public static class Revolver
      => (bool activeRoll, bool activeLine)
      =>
      {
+        int offset = lineIx - SelectedLine(rollIx);
+        int linecountThree = Min(lines.Count, 3);
+
+         if (1 < Abs(offset))
+        {
+             return;
+        }
          GameObject textGo = new GameObject();
          textGo.transform.parent = canvasGo?.transform;
          textGo.name = revolverTextTag;
@@ -101,11 +108,12 @@ public static class Revolver
          text.fontStyle = activeRoll ? FontStyle.Bold : FontStyle.Normal;
          text.color = activeLine ? Color.yellow : Color.gray;
          text.text = line;
-         text.alignment = TextAnchor.MiddleCenter;
+         text.alignment = TextAnchor.UpperCenter;
+
 
          Rect? subRect = canvasGo?.GetComponent<RectTransform>()?.rect
             .LowerThird()
-            .SubRect(rollCount, lines.Count, rollIx, lineIx);
+            .SubRect(rollCount, linecountThree, rollIx, (offset+3)%linecountThree);
 
          if (subRect.HasValue)
          {

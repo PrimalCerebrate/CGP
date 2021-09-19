@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class ProfessorBrain : MonoBehaviour
 {
-    public GameObject centralbrainObject;
-
+ 
     // Start is called before the first frame update
     void Start()
     {
-        centralbrainObject = GameObject.Find("CentralBrainObject");
+        
     }
 
     // Update is called once per frame
