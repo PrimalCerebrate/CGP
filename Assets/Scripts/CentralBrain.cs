@@ -51,9 +51,7 @@ public static class Revolver
         string pathToConversation = Application.streamingAssetsPath + "/Conversations/" + filename;
         if (pathToConversation is null) return;
         conversation = Conversation.Editor.Conversation.GetConversation(pathToConversation);
-        currentNode = null;
-        ResetRollPrinters();
-        PrintRolls();
+        SetCurrentNodeAndPrint(null);
     }
 
     delegate void LinePrinter(bool activeRoll, bool activeLine);
@@ -173,10 +171,15 @@ public static class Revolver
         ContentNode? node = SubNodes.Where(FitsPhrase).FirstOrDefault();
         if (null != node)
         {
-            currentNode = node;
-            ResetRollPrinters();
-            PrintRolls();
+            SetCurrentNodeAndPrint(node);
         }
+    }
+
+    static void SetCurrentNodeAndPrint(ContentNode? node)
+    {
+        currentNode = node;
+        ResetRollPrinters();
+        PrintRolls();
     }
 
     /// <summary>
